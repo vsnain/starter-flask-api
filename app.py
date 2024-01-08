@@ -1,18 +1,14 @@
 from flask import Flask, render_template
-import requests
-from bs4 import BeautifulSoup
 import json
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 import boto3
 from selenium import webdriver
 import chromedriver_autoinstaller
+from bs4 import BeautifulSoup
 
 # Automatically download and install ChromeDriver
 chromedriver_autoinstaller.install()
-
-# ChromeDriver will be in the PATH, no need to specify the path
-driver = webdriver.Chrome()
 
 app = Flask(__name__)
 
@@ -51,8 +47,6 @@ def scrape_indeed_job_count():
 
     # If the element is not found, return 0
     return 0
-
-    
 
 def save_job_count_to_s3(job_count, timestamp):
     # Get existing data from S3
