@@ -22,21 +22,20 @@ def scrape_indeed_job_count():
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    # Look for span elements with a text that contains 'Jobs'
-    job_count_elements = soup.find_all('span', text=lambda text: text and 'jobs' in text)
+    # Look for span elements with a text that contains 'jobs' (case-insensitive)
+    job_count_elements = soup.find_all('span', text=re.compile(r'\bjobs\b', re.IGNORECASE))
     print(job_count_elements)
-    # Iterate through job count elements and try to find the pattern 'number in 100s Jobs'
+    # Iterate through job count elements and try to find the pattern 'number in 100s jobs'
     for job_count_element in job_count_elements:
-        job_count_text = job_count_element.get_text(strip=True)
-        
         # Extract the number of jobs using regular expressions
-        match = re.search(r'\d+', job_count_text)
+        match = re.search(r'\d+', job_count_element.get_text(strip=True))
         if match:
             job_count = int(match.group())
             return job_count
 
     # If the element is not found, return 0
     return 0
+
 
 
 def save_job_count_to_s3(job_count, timestamp):
