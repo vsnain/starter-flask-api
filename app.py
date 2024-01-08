@@ -4,7 +4,6 @@ from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 import boto3
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from bs4 import BeautifulSoup
 
@@ -24,8 +23,8 @@ def scrape_indeed_job_count():
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')  # Disable GPU acceleration to avoid certain issues
 
-    # Use ChromeService instead of webdriver.Chrome()
-    driver = webdriver.Chrome(service=ChromeService('./chromedriver'), options=chrome_options)
+    # Use ChromeDriver with ChromeOptions
+    driver = webdriver.Chrome('./chromedriver', options=chrome_options)
     
     driver.get(url)
 
