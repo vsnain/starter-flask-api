@@ -2,13 +2,17 @@ from flask import Flask, render_template
 import requests
 from bs4 import BeautifulSoup
 import json
-import os
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
+import boto3
 
 app = Flask(__name__)
 
-DATA_FILE = 'job_count_data.json'
+# Initialize S3 client
+s3 = boto3.client('s3')
+
+# Use a specific path for the S3 object key
+S3_OBJECT_KEY = "some_files/job_count_data.json"
 
 def scrape_indeed_job_count():
     search_query = 'Software Engineer'
@@ -25,35 +29,40 @@ def scrape_indeed_job_count():
     else:
         return 0
 
-def save_job_count_to_file(job_count, timestamp):
-    data = load_data_from_file()
+def save_job_count_to_s3(job_count, timestamp):
+    # Get existing data from S3
+    existing_data = get_data_from_s3()
 
     # Append new data to the existing list
-    data.append({'timestamp': timestamp, 'job_count': job_count})
+    existing_data.append({'timestamp': timestamp, 'job_count': job_count})
 
-    # Save the updated data to the file
-    with open(DATA_FILE, 'w') as file:
-        json.dump(data, file, indent=2)
+    # Save the updated data to S3
+    s3.put_object(
+        Body=json.dumps(existing_data),
+        Bucket="cyclic-colorful-culottes-colt-us-west-2",
+        Key=S3_OBJECT_KEY
+    )
 
-def load_data_from_file():
-    if not os.path.exists(DATA_FILE):
+def get_data_from_s3():
+    try:
+        # Get data from S3
+        existing_data = s3.get_object(
+            Bucket="cyclic-colorful-culottes-colt-us-west-2",
+            Key=S3_OBJECT_KEY
+        )
+
+        return json.loads(existing_data['Body'].read())
+    except s3.exceptions.NoSuchKey:
+        # If the key does not exist yet, return an empty list
         return []
-    
-    with open(DATA_FILE, 'r') as file:
-        try:
-            data = json.load(file)
-        except json.JSONDecodeError:
-            data = []
-
-    return data
 
 @app.route('/')
 def index():
     job_count = scrape_indeed_job_count()
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
-    # Save the job count and timestamp to the data file
-    save_job_count_to_file(job_count, timestamp)
+    # Save the job count and timestamp to S3
+    save_job_count_to_s3(job_count, timestamp)
 
     return render_template('index.html', job_count=job_count, timestamp=timestamp)
 
@@ -62,4 +71,4 @@ if __name__ == '__main__':
     scheduler.add_job(scrape_indeed_job_count, 'cron', hour='1,23')
     scheduler.start()
 
-    app.run(debug=True, use_reloader=False)  # use_reloader=False to prevent schedule duplication
+    app.run(debug=True, use_reloader=False)
