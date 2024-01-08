@@ -23,7 +23,8 @@ def scrape_indeed_job_count():
 
     # Use the CSS selector to find the span element containing the job count
     job_count_element = soup.select_one('#jobsearch-JapanPage > div > div.css-hyhnne.e37uo190 > div.css-pprl14.eu4oa1w0 > div.jobsearch-JobCountAndSortPane.css-lrjfwh.eu4oa1w0 > div > div > div.jobsearch-JobCountAndSortPane-jobCount.css-13jafh6.eu4oa1w0 > span:nth-child(1)')
-
+    print("Testing")
+    print(job_count_element)
     # Check if the element exists
     if job_count_element:
         job_count_text = job_count_element.text.strip()
