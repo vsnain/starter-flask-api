@@ -26,7 +26,7 @@ def scrape_indeed_job_count():
         soup = BeautifulSoup(response.text, 'html.parser')
 
         # Find the job count element
-        job_count_element = soup.find('div', class_='jobsearch-JobMetadataHeader-item')
+        job_count_element = soup.find_all('div', class_='jobsearch-JobCountAndSortPane-jobCount')
 
         # Check if the element exists
         if job_count_element:
