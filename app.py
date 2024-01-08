@@ -23,7 +23,7 @@ def scrape_indeed_job_count():
     soup = BeautifulSoup(response.content, 'html.parser')
 
     # Look for span elements with a text that contains 'Jobs'
-    job_count_elements = soup.find_all('span', text=lambda text: text and 'Jobs' in text)
+    job_count_elements = soup.find_all('span', text=lambda text: text and 'jobs' in text)
     print(job_count_elements)
     # Iterate through job count elements and try to find the pattern 'number in 100s Jobs'
     for job_count_element in job_count_elements:
