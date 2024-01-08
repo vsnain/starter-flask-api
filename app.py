@@ -20,7 +20,7 @@ def scrape_indeed_job_count():
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Find the parent div with the specified class name
-    parent_div = soup.find('div', class_='jobsearch-JobCountAndSortPane-jobCount')
+    parent_div = soup.find('div', class_="jobsearch-JobCountAndSortPane-jobCount css-13jafh6 eu4oa1w0")
     print(parent_div)
     # Check if the parent div exists
     if parent_div:
