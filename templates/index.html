@@ -1,7 +1,13 @@
-<!doctype html>
-<title>Hello from Flask</title>
-{% if name %}
-  <h1>Hello {{ name }}!</h1>
-{% else %}
-  <h1>Hello, World!</h1>
-{% endif %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indeed Job Count</title>
+</head>
+<body>
+    <h1>Job Postings for "Software Engineer" in the Last 24 Hours</h1>
+    <p>Number of job postings: {{ job_count }}</p>
+    <p>Last updated at: {{ timestamp }}</p>
+</body>
+</html>
