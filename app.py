@@ -15,19 +15,19 @@ s3 = boto3.client('s3')
 S3_OBJECT_KEY = "some_files/job_count_data.json"
 
 def scrape_indeed_job_count():
-    search_query = 'Software Engineer'
-    url = f'https://www.indeed.com/jobs?q={search_query}&fromage=1'
-
+    # search_query = 'Software Engineer'
+    # url = f'https://www.indeed.com/jobs?q={search_query}&fromage=1'
+    url = 'https://www.indeed.com/jobs?q=software+engineer&sort=date&fromage=1'
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Extract the job count from the HTML
     job_count_element = soup.find('div', {'id': 'searchCountPages'})
-    if job_count_element:
-        job_count_text = job_count_element.text.strip().split()[-2]
-        return int(job_count_text.replace(',', ''))
-    else:
-        return 0
+    job_count_element = soup.find('div', class_='jobsearch-JobCountAndSortPane-jobCount').find('span')
+    job_count = job_count_element.text.strip()
+    
+    return int(job_count)
+    
 
 def save_job_count_to_s3(job_count, timestamp):
     # Get existing data from S3
