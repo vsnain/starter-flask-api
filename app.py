@@ -3,8 +3,7 @@ import json
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 import boto3
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options as ChromeOptions
+import requests
 from bs4 import BeautifulSoup
 
 app = Flask(__name__)
@@ -18,37 +17,23 @@ S3_OBJECT_KEY = "some_files/job_count_data.json"
 def scrape_indeed_job_count():
     url = 'https://www.indeed.com/jobs?q=software+engineer&sort=date&fromage=1'
 
-    # Set up Chrome options for a headless browser
-    chrome_options = ChromeOptions()
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--disable-gpu')  # Disable GPU acceleration to avoid certain issues
-
-    # Use ChromeDriver with ChromeOptions
-    driver = webdriver.Chrome('./chromedriver', options=chrome_options)
+    # Fetch the HTML content of the page using requests
+    response = requests.get(url)
     
-    driver.get(url)
+    # Check if the request was successful (status code 200)
+    if response.status_code == 200:
+        # Use BeautifulSoup to parse the HTML content
+        soup = BeautifulSoup(response.text, 'html.parser')
 
-    # Wait for the page to load (you might need to adjust the time based on your network speed)
-    driver.implicitly_wait(10)
+        # Find the job count element
+        job_count_element = soup.find('div', class_='jobsearch-JobMetadataHeader-item')
 
-    # Get the page source after JavaScript execution
-    page_source = driver.page_source
+        # Check if the element exists
+        if job_count_element:
+            job_count = job_count_element.text.strip()
+            return int(job_count.replace(',', ''))  # Remove commas and convert to integer
 
-    # Close the WebDriver
-    driver.quit()
-
-    # Use BeautifulSoup to parse the page source
-    soup = BeautifulSoup(page_source, 'html.parser')
-
-    # Find the job count element
-    job_count_element = soup.find('div', class_='jobsearch-JobMetadataHeader-item')
-
-    # Check if the element exists
-    if job_count_element:
-        job_count = job_count_element.text.strip()
-        return int(job_count.replace(',', ''))  # Remove commas and convert to integer
-
-    # If the element is not found, return 0
+    # If the element is not found or the request fails, return 0
     return 0
 
 def save_job_count_to_s3(job_count, timestamp):
