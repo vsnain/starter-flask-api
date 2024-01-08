@@ -5,6 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import boto3
 import requests
 from bs4 import BeautifulSoup
+import re
 
 app = Flask(__name__)
 
