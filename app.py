@@ -17,23 +17,25 @@ S3_OBJECT_KEY = "some_files/job_count_data.json"
 def scrape_indeed_job_count():
     url = 'https://www.indeed.com/jobs?q=software+engineer&sort=date&fromage=1'
 
-    # Fetch the HTML content of the page using requests
+    # Fetch the HTML content from the URL
     response = requests.get(url)
-    
-    # Check if the request was successful (status code 200)
-    if response.status_code == 200:
-        # Use BeautifulSoup to parse the HTML content
-        soup = BeautifulSoup(response.text, 'html.parser')
+    soup = BeautifulSoup(response.content, 'html.parser')
 
-        # Find the job count element
-        job_count_element = soup.select_one('#jobsearch-JapanPage > div > div.css-hyhnne.e37uo190 > div.css-pprl14.eu4oa1w0 > div.jobsearch-JobCountAndSortPane.css-lrjfwh.eu4oa1w0 > div > div > div.jobsearch-JobCountAndSortPane-jobCount.css-13jafh6.eu4oa1w0')
-        print(job_count_element)
-        # Check if the element exists
-        if job_count_element:
-            job_count = job_count_element.text.strip()
-            return int(job_count.replace(',', ''))  # Remove commas and convert to integer
+    # Use the CSS selector to find the span element containing the job count
+    job_count_element = soup.select_one('#jobsearch-JapanPage > div > div.css-hyhnne.e37uo190 > div.css-pprl14.eu4oa1w0 > div.jobsearch-JobCountAndSortPane.css-lrjfwh.eu4oa1w0 > div > div > div.jobsearch-JobCountAndSortPane-jobCount.css-13jafh6.eu4oa1w0 > span:nth-child(1)')
 
-    # If the element is not found or the request fails, return 0
+    # Check if the element exists
+    if job_count_element:
+        job_count_text = job_count_element.text.strip()
+        
+        # Extract the number of jobs using regular expressions
+        import re
+        match = re.search(r'\d+', job_count_text)
+        if match:
+            job_count = int(match.group())
+            return job_count
+
+    # If the element is not found, return 0
     return 0
 
 def save_job_count_to_s3(job_count, timestamp):
