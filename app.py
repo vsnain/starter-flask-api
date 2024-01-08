@@ -5,6 +5,7 @@ import json
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 import boto3
+from selenium import webdriver
 
 app = Flask(__name__)
 
@@ -16,24 +17,32 @@ S3_OBJECT_KEY = "some_files/job_count_data.json"
 
 def scrape_indeed_job_count():
     url = 'https://www.indeed.com/jobs?q=software+engineer&sort=date&fromage=1'
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
 
-    # Find the parent div with the specified class name
-    parent_div = soup.find('div', class_="jobsearch-JobCountAndSortPane-jobCount css-13jafh6 eu4oa1w0")
-    print(parent_div)
-    # Check if the parent div exists
-    if parent_div:
-        # Find the span inside the parent div
-        job_count_element = parent_div.find('span')
+    # Set up the WebDriver (make sure you have the corresponding WebDriver installed, e.g., chromedriver)
+    driver = webdriver.Chrome()
+    driver.get(url)
 
-        # Check if the span inside the parent div exists
-        if job_count_element:
-            job_count = job_count_element.text.strip()
+    # Wait for the page to load (you might need to adjust the time based on your network speed)
+    driver.implicitly_wait(10)
 
-            return int(job_count)
-    
-    # If the structure is not as expected or job count is not found, return 0
+    # Get the page source after JavaScript execution
+    page_source = driver.page_source
+
+    # Close the WebDriver
+    driver.quit()
+
+    # Use BeautifulSoup to parse the page source
+    soup = BeautifulSoup(page_source, 'html.parser')
+
+    # Find the job count element
+    job_count_element = soup.find('div', class_='jobsearch-JobMetadataHeader-item')
+
+    # Check if the element exists
+    if job_count_element:
+        job_count = job_count_element.text.strip()
+        return int(job_count.replace(',', ''))  # Remove commas and convert to integer
+
+    # If the element is not found, return 0
     return 0
 
     
