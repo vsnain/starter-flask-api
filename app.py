@@ -6,6 +6,13 @@ from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 import boto3
 from selenium import webdriver
+import chromedriver_autoinstaller
+
+# Automatically download and install ChromeDriver
+chromedriver_autoinstaller.install()
+
+# ChromeDriver will be in the PATH, no need to specify the path
+driver = webdriver.Chrome()
 
 app = Flask(__name__)
 
