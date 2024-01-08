@@ -17,14 +17,6 @@ S3_OBJECT_KEY = "some_files/job_count_data.json"
 
 
 
-I apologize for the confusion. Let's try a different approach using a more flexible search by looking for the span element that contains the word "jobs" (case-insensitive). Here's the modified code:
-
-python
-Copy code
-import requests
-from bs4 import BeautifulSoup
-import re
-
 def scrape_indeed_job_count():
     url = 'https://www.indeed.com/jobs?q=software+engineer&sort=date&fromage=1'
 
