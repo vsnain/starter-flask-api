@@ -21,7 +21,7 @@ def scrape_indeed_job_count():
 
     # Find the parent div with the specified class name
     parent_div = soup.find('div', class_='jobsearch-JobCountAndSortPane-jobCount')
-
+    print(parent_div)
     # Check if the parent div exists
     if parent_div:
         # Find the span inside the parent div
@@ -32,7 +32,7 @@ def scrape_indeed_job_count():
             job_count = job_count_element.text.strip()
 
             return int(job_count)
-
+    
     # If the structure is not as expected or job count is not found, return 0
     return 0
 
