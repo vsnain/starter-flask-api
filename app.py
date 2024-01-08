@@ -16,6 +16,15 @@ s3 = boto3.client('s3')
 S3_OBJECT_KEY = "some_files/job_count_data.json"
 
 
+
+I apologize for the confusion. Let's try a different approach using a more flexible search by looking for the span element that contains the word "jobs" (case-insensitive). Here's the modified code:
+
+python
+Copy code
+import requests
+from bs4 import BeautifulSoup
+import re
+
 def scrape_indeed_job_count():
     url = 'https://www.indeed.com/jobs?q=software+engineer&sort=date&fromage=1'
 
@@ -23,19 +32,19 @@ def scrape_indeed_job_count():
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    # Look for span elements with a text that contains 'jobs' (case-insensitive)
+    # Search for span elements containing the word 'jobs' (case-insensitive)
     job_count_elements = soup.find_all('span', text=re.compile(r'\bjobs\b', re.IGNORECASE))
-    target_span = soup.find('span', text='637 jobs')
-    print(job_count_elements,target_span)
-    # Iterate through job count elements and try to find the pattern 'number in 100s jobs'
-    for job_count_element in job_count_elements:
-        # Extract the number of jobs using regular expressions
-        match = re.search(r'\d+', job_count_element.get_text(strip=True))
+
+    # Iterate through found elements
+    for element in job_count_elements:
+        # Extract the number of jobs from each element
+        job_count_text = element.text.strip()
+        match = re.search(r'\d+', job_count_text)
         if match:
             job_count = int(match.group())
             return job_count
 
-    # If the element is not found, return 0
+    # If no matching element is found, return 0
     return 0
 
 
