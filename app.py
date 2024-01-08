@@ -26,6 +26,10 @@ def scrape_indeed_job_count():
 
     # Search for span elements containing the word 'jobs' (case-insensitive)
     job_count_elements = soup.find_all('span', text=re.compile(r'\bjobs\b', re.IGNORECASE))
+    all_text = soup.get_text(separator='\n')
+
+    # Print all the text (you may want to limit the output)
+    print(all_text)
 
     # Iterate through found elements
     for element in job_count_elements:
