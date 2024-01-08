@@ -4,11 +4,9 @@ from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 import boto3
 from selenium import webdriver
-import chromedriver_autoinstaller
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options as ChromeOptions
 from bs4 import BeautifulSoup
-
-# Automatically download and install ChromeDriver
-chromedriver_autoinstaller.install()
 
 app = Flask(__name__)
 
@@ -21,8 +19,14 @@ S3_OBJECT_KEY = "some_files/job_count_data.json"
 def scrape_indeed_job_count():
     url = 'https://www.indeed.com/jobs?q=software+engineer&sort=date&fromage=1'
 
-    # Set up the WebDriver (make sure you have the corresponding WebDriver installed, e.g., chromedriver)
-    driver = webdriver.Chrome()
+    # Set up Chrome options for a headless browser
+    chrome_options = ChromeOptions()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--disable-gpu')  # Disable GPU acceleration to avoid certain issues
+
+    # Use ChromeService instead of webdriver.Chrome()
+    driver = webdriver.Chrome(service=ChromeService('./chromedriver'), options=chrome_options)
+    
     driver.get(url)
 
     # Wait for the page to load (you might need to adjust the time based on your network speed)
